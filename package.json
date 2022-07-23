@@ -1,6 +1,6 @@
 {
   "name": "@yankeeinlondon/builder-api",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "packageManager": "pnpm@7.5.4",
   "description": "An API used to extend the capabilities of @antfu/vite-plugin-md",
   "scripts": {
@@ -26,6 +26,9 @@
     "vitejs",
     "vite",
     "vuejs"
+  ],
+  "files": [
+    "dist"
   ],
   "author": "Ken Snyder <ken@ken.net>",
   "license": "MIT",

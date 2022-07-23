@@ -1,0 +1,79 @@
+{
+  "name": "builder-api",
+  "version": "0.1.0",
+  "packageManager": "pnpm@7.5.4",
+  "description": "An API used to extend the capabilities of @antfu/vite-plugin-md",
+  "scripts": {
+    "build": "tsup src/index.ts --format=esm,cjs --dts --clean",
+    "lint": "run-p lint:*",
+    "lint:src": "eslint src/**/*.ts --fix",
+    "lint:test": "eslint test/**/*.ts --fix",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "test:ui": "vitest:ui",
+    "watch": "tsup src/index.ts --format=esm,cjs --dts --watch",
+    "audit:fix": "pnpm audit --fix",
+    "release": "run-s lint release:latest test:ci audit:fix release:bump",
+    "release:latest": "pnpm install",
+    "release:bump": "bumpp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yankeeinlondon/builder-api.git"
+  },
+  "keywords": [
+    "markdown",
+    "vitejs",
+    "vite",
+    "vuejs"
+  ],
+  "author": "Ken Snyder <ken@ken.net>",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bugs": {
+    "url": "https://github.com/yankeeinlondon/builder-api/issues"
+  },
+  "homepage": "https://github.com/yankeeinlondon/builder-api#readme",
+  "dependencies": {
+    "@vitejs/plugin-vue": "^3.0.1",
+    "fp-ts": "^2.12.1",
+    "inferred-types": "^0.20.0",
+    "markdown-it": "^13.0.1",
+    "rollup": "^2.77.0",
+    "vue": "^3.2.37"
+  },
+  "peerDependencies": {
+    "vite-plugin-md": "^0.19.7"
+  },
+  "devDependencies": {
+    "@type-challenges/utils": "^0.1.1",
+    "@types/node": "^14.18.22",
+    "@typescript-eslint/eslint-plugin": "^5.30.7",
+    "@typescript-eslint/parser": "^5.30.7",
+    "@vitest/ui": "^0.18.1",
+    "eslint": "^8.20.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-unicorn": "^43.0.2",
+    "esno": "^0.16.3",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "tsup": "^6.1.3",
+    "typescript": "^4.7.4",
+    "vite": "^3.0.2",
+    "vite-plugin-md": "^0.19.7",
+    "vitest": "^0.18.1"
+  }
+}

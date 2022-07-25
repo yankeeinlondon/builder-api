@@ -16,7 +16,6 @@ export default defineConfig({
   plugins: [
 
     Markdown({
-      // builders: [link(), code()],
       excerpt: true,
       exposeExcerpt: true,
     }),

@@ -51,12 +51,10 @@
     "@yankeeinlondon/happy-wrapper": "^2.5.0"
   },
   "peerDependencies": {
-    "@vitejs/plugin-vue": "^3.0.1",
     "fp-ts": "^2.12.1",
     "inferred-types": "^0.22.0",
     "markdown-it": "^13.0.1",
-    "vite-plugin-md": "*",
-    "vue": "^3.2.37"
+    "vite-plugin-md": "*"
   },
   "devDependencies": {
     "@rollup/pluginutils": "^4.2.1",
@@ -80,7 +78,7 @@
     "markdown-it": "^13.0.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
-    "rollup": "^2.77.0",
+    "rollup": "^2.77.2",
     "tsup": "^6.2.0",
     "typescript": "^4.7.4",
     "vite": "^3.0.3",

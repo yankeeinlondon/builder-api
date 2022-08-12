@@ -48,6 +48,7 @@
   },
   "homepage": "https://github.com/yankeeinlondon/builder-api#readme",
   "dependencies": {
+    "@types/markdown-it": "^12.2.3",
     "@yankeeinlondon/happy-wrapper": "^2.5.0"
   },
   "peerDependencies": {

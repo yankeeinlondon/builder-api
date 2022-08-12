@@ -1,5 +1,68 @@
 import { TaskEither } from "fp-ts/lib/TaskEither";
-import type { IPipelineStage, Pipeline, PipelineStage, RulesUse } from "vite-plugin-md";
+import type { IPipelineStage, LinkProperty, Options, Pipeline, PipelineStage, RulesUse, ViteConfig } from "vite-plugin-md";
+import type {PluginSimple, PluginWithOptions} from "markdown-it";
+
+export interface ConfigurationValidation {
+  /**
+   * The overall Vite configuration for the project / app
+   */
+  viteConfig: ViteConfig;
+  /**
+   * Provides a query interface to lookup the configuration of any given builder
+   * that's been added (will return _undefine_ if not found).
+   * 
+   * ```ts
+   * .initializer({
+   *    builderConfig(("code", l) => {
+   *      if(!code) {
+   *        l.warn(
+   *          "this plugin works best when used with 'code' but is not required!"
+   *        );
+   *      }
+   *    })
+   * })
+   * ```
+   * 
+   * Note: _use the provided `logger` to log messages and unless you use `logger.error()`
+   * the execution will proceed._
+   */
+  builderConfig: (cb: (builder: string, logger: any) =>  (Record<string, any> | undefined)) => ConfigurationValidation;
+  /**
+   * Lays out the stages of the pipeline and the order of builder execution
+   * at each stage.
+   */
+  builderPipeline: Record<IPipelineStage, string[]>;
+
+  /**
+   * If you want to add a `<link>` header to the page and know before execution of the handler what
+   * it is, then you can add it here.
+   */
+  addLink: (link: LinkProperty) => ConfigurationValidation;
+}
+
+export interface BuilderInitializer {
+  /**
+   * If your plugin expects one or more markdown-it plugins to run prior to it's handler
+   * than you must state it here.
+   */
+  useMarkdownItPlugins(...plugins: (PluginSimple | PluginWithOptions)[]): BuilderInitializer;
+  /**
+   * If your builder depends on another builder being run prior to it then you can state that
+   * here. This will not only ensure that ordering is maintained but also that 
+   */
+  usesBuilderApi<O, E>(builder: BuilderApi<O,E>): BuilderInitializer;
+  addStyles(...style: any[]): BuilderInitializer;
+  /**
+   * Provides useful _state_ for a builder author to double-check everything is configured and setup
+   * correctly prior to 
+   * 
+   * @param viteConfig 
+   * @param pluginConfig 
+   * @param pipelineHooks 
+   */
+  validateConfig(viteConfig: ViteConfig, pluginConfig: Options, pipelineHooks: Record<IPipelineStage, string[]): BuilderInitializer;
+}
+
 
 /**
  * Builder options are expected to be a key/value dictionary but must

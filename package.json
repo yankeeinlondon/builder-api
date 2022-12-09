@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/yankeeinlondon/builder-api#readme",
   "dependencies": {
-    "@yankeeinlondon/happy-wrapper": "^2.10.0",
+    "@yankeeinlondon/happy-wrapper": "^2.10.1",
     "fp-ts": "^2.13.1",
     "inferred-types": "^0.37.6",
     "vite-plugin-md": "^0.20.4"

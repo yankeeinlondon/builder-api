@@ -5,14 +5,7 @@ import Markdown from "vite-plugin-md";
 
 // used for testing, library code uses TSUP to build exports
 export default defineConfig({
-  test: {
-    dir: "test",
-    exclude: ["**/*.spec.ts"],
-    environment: "happy-dom",
-    api: {
-      host: "0.0.0.0",
-    },
-  },
+
   plugins: [
 
     Markdown({

@@ -58,6 +58,7 @@
   "devDependencies": {
     "@rollup/pluginutils": "^5.0.2",
     "@type-challenges/utils": "^0.1.1",
+    "@types/markdown-it": "^12.2.3",
     "@types/node": "^14.18.34",
     "@typescript-eslint/eslint-plugin": "^5.46.0",
     "@typescript-eslint/parser": "^5.46.0",

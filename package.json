@@ -49,11 +49,11 @@
     "@types/markdown-it": "^12.2.3",
     "@yankeeinlondon/happy-wrapper": "^2.9.4",
     "fp-ts": "^2.13.1",
-    "inferred-types": "^0.37.6"
+    "inferred-types": "^0.37.6",
+    "vite-plugin-md": ">=0.20.4"
   },
   "peerDependencies": {
-    "markdown-it": "^13.0.1",
-    "vite-plugin-md": ">=0.20.4"
+    "markdown-it": "^13.0.1"
   },
   "devDependencies": {
     "@rollup/pluginutils": "^5.0.2",

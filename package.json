@@ -52,10 +52,8 @@
     "inferred-types": "^0.37.6"
   },
   "peerDependencies": {
-    "fp-ts": "^2.13.1",
-    "inferred-types": "^0.37.6",
     "markdown-it": "^13.0.1",
-    "vite-plugin-md": "*"
+    "vite-plugin-md": ">=0.20.4"
   },
   "devDependencies": {
     "@rollup/pluginutils": "^5.0.2",

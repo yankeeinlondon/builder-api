@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import { TaskEither } from "fp-ts/lib/TaskEither";
 import type { IPipelineStage, LinkProperty, Options, Pipeline, PipelineStage, RulesUse, ViteConfig } from "vite-plugin-md";
 import type {PluginSimple, PluginWithOptions} from "markdown-it";
@@ -50,7 +51,7 @@ export interface BuilderInitializer {
    * If your builder depends on another builder being run prior to it then you can state that
    * here. This will not only ensure that ordering is maintained but also that 
    */
-  usesBuilderApi<O, E>(builder: BuilderApi<O,E>): BuilderInitializer;
+  usesBuilderApi<O extends BuilderOptions, E extends IPipelineStage>(builder: BuilderApi<O,E>): BuilderInitializer;
   addStyles(...style: any[]): BuilderInitializer;
   /**
    * Provides useful _state_ for a builder author to double-check everything is configured and setup
@@ -60,7 +61,7 @@ export interface BuilderInitializer {
    * @param pluginConfig 
    * @param pipelineHooks 
    */
-  validateConfig(viteConfig: ViteConfig, pluginConfig: Options, pipelineHooks: Record<IPipelineStage, string[]): BuilderInitializer;
+  validateConfig(viteConfig: ViteConfig, pluginConfig: Options, pipelineHooks: Record<IPipelineStage, string[]>): BuilderInitializer;
 }
 
 

@@ -49,7 +49,7 @@
     "@yankeeinlondon/happy-wrapper": "^2.10.1",
     "fp-ts": "^2.13.1",
     "inferred-types": "^0.37.6",
-    "vite-plugin-md": "^0.20.4"
+    "vite-plugin-md": ">=0.20.4"
   },
   "peerDependencies": {
     "@types/markdown-it": "^12.2.3",

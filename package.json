@@ -47,13 +47,10 @@
   "homepage": "https://github.com/yankeeinlondon/builder-api#readme",
   "dependencies": {
     "@yankeeinlondon/happy-wrapper": "^2.10.1",
+    "@types/markdown-it": "^12.2.3",
     "fp-ts": "^2.13.1",
     "inferred-types": "^0.37.6",
     "vite-plugin-md": "^0.20.6"
-  },
-  "peerDependencies": {
-    "@types/markdown-it": "^12.2.3",
-    "markdown-it": "^13.0.1"
   },
   "devDependencies": {
     "@type-challenges/utils": "^0.1.1",

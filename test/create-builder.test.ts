@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { describe, expect, it } from "vitest";
 import type { Equal, Expect, ExpectExtends } from "@type-challenges/utils";
-import type { BuilderApi, BuilderApiMeta, BuilderOptionsFromUser, BuilderReadyForInitializer, BuilderReadyForOptions, BuilderRegistration, ConfiguredBuilder } from "../src";
+import type { BuilderApi, BuilderApiMeta, BuilderOptionsFromUser, BuilderReadyForInitializer, BuilderReadyForOptions, ConfiguredBuilder } from "../src";
 import { createBuilder } from "../src";
 import { PipelineStage } from "vite-plugin-md";
 

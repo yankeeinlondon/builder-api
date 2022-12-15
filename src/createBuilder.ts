@@ -2,11 +2,11 @@ import type {
   IPipelineStage,
 } from "vite-plugin-md";
 import { createFnWithProps } from "inferred-types";
-import type { BuilderApi, BuilderApiMeta, BuilderOptions, BuilderRegistration, CreateBuilder } from "./types";
+import type { BuilderApi, BuilderApiMeta, BuilderOptions, BuilderRegistration, ConfiguredBuilder, CreateBuilder } from "./types";
 
-function createAboutSection<N extends string>(name: N, description: string): BuilderApiMeta {
+function createAboutSection<N extends string, S extends IPipelineStage>(name: N, description: string, stage: S): BuilderApiMeta {
   return {
-    about: { name, description },
+    about: { name, description, stage },
   } as BuilderApiMeta;
 }
 
@@ -53,10 +53,10 @@ export const createBuilder: CreateBuilder = <E extends IPipelineStage>(name: str
                   } as unknown as Omit<BuilderRegistration<O, E>, "options">;
 
                   // return a function so that the consumer can add in their options
-                  const fn = (options: Partial<O> = {} as Partial<O>) =>
+                  const fn = (options: Partial<O> = {} as Partial<O>): ConfiguredBuilder<O,E> =>
                     () => ({ ...registration, options }) as BuilderRegistration<O, E>;
 
-                  const apiMeta = createAboutSection(name, meta.description || "");
+                  const apiMeta = createAboutSection(name, meta.description || "", lifecycle);
                   const api = createFnWithProps(fn, apiMeta);
 
                   return api as BuilderApi<O, E>;

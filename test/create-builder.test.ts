@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { describe, expect, it } from "vitest";
 import type { Equal, Expect, ExpectExtends } from "@type-challenges/utils";
-import type { BuilderApi, BuilderReadyForInitializer, BuilderReadyForOptions } from "../src";
+import type { BuilderApi, BuilderApiMeta, BuilderOptionsFromUser, BuilderReadyForInitializer, BuilderReadyForOptions, BuilderRegistration, ConfiguredBuilder } from "../src";
 import { createBuilder } from "../src";
 import { PipelineStage } from "vite-plugin-md";
 
@@ -59,5 +59,29 @@ describe("Builder API registration", () => {
 
     expect(builder.about).toBeDefined();
     expect(builder.about.description).toBe("this is a test");
+    expect(builder.about.stage).toBe("parsed");
   });
+
+  
+  it("ReturnType of BuilderAPI provides BuilderRegistration, passing options provides ConfiguredBuilder", () => {
+    const builder = createBuilder("foo", "parsed")
+    .options<{ color: string }>()
+    .initializer()
+    .handler(p => Promise.resolve(p))
+    .meta({
+      description: "this is a test",
+    });
+
+    type B =typeof builder;
+    type R = ReturnType<B>;
+
+    type cases = [
+      Expect<Equal<B, BuilderOptionsFromUser<{color: string}, "parsed"> & BuilderApiMeta>>,
+      Expect<Equal<R, ConfiguredBuilder<{color: string}, "parsed">>>,
+    ];
+    const cases: cases = [ true, true];
+    
+  });
+  
+
 });

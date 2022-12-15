@@ -175,12 +175,16 @@ export interface BuilderApiMeta {
   about: {
     name: Readonly<string>;
     description: Readonly<string>;
+    stage: Readonly<string>;
   };
 }
 
-export type BuilderOptionsFromUser<O extends {}, S extends IPipelineStage> = (options?: Partial<O>) => () => BuilderRegistration<O, S>;
+export type BuilderOptionsFromUser<O extends {}, S extends IPipelineStage> = (options?: Partial<O>) => ConfiguredBuilder<O, S>;
 
-
+/**
+ * A builder which has been configured with the user's options
+ */
+export type ConfiguredBuilder<O extends {}, S extends IPipelineStage> = () => BuilderRegistration<O,S>;
 
 export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<BuilderOptions, IPipelineStage>[] | []>;
 
@@ -228,3 +232,4 @@ export interface BuilderReadyForOptions<E extends IPipelineStage> {
 export interface CreateBuilder {
   <E extends IPipelineStage>(name: string, lifecycle: E): BuilderReadyForOptions<E>;
 }
+ 

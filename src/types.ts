@@ -68,7 +68,7 @@ export interface BuilderInitializer {
 /**
  * Builder options are expected to be a key/value dictionary but must
  * be allowed to be an empty object
- * */
+ */
 export interface BuilderOptions { [key: string]: any }
 
 /**
@@ -79,7 +79,17 @@ export type BuilderHandler<
   S extends IPipelineStage,
 > = (payload: Pipeline<S>, options: O) => Promise<Pipeline<S>>;
 
-export interface BuilderRegistration<O extends BuilderOptions, S extends IPipelineStage> {
+/**
+ * **BuilderRegistration**
+ * 
+ * Represents a Builder API's configured _options_ which includes
+ * the stage in the lifecycle that this builder will be given it's
+ * execution time.
+ */
+export interface BuilderRegistration<
+  O extends BuilderOptions, 
+  S extends IPipelineStage
+> {
   name: Readonly<string>;
   description?: Readonly<string>;
   /** The lifecycle event/hook which this builder will respond to */

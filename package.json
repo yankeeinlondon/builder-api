@@ -2,7 +2,7 @@
   "name": "@yankeeinlondon/builder-api",
   "version": "1.2.2",
   "type": "module",
-  "packageManager": "pnpm@7.5.4",
+  "packageManager": "pnpm@7.18.2",
   "description": "An API used to extend the capabilities of @antfu/vite-plugin-md",
   "scripts": {
     "build": "tsup src/index.ts --format=esm --dts --clean  ",

@@ -647,13 +647,14 @@ packages:
     resolution: {integrity: sha512-Ewzq5Yhimg7pSztDV+RH1UDKBzmtqieXQlpTVm2AwraoRL/Rks96mvd8Vgi7Lj+h+TH8dv7mXD3FRZR3TUvbSg==}
     dev: true
 
-  /@yankeeinlondon/builder-api/1.2.1_jpq67ecuqssjycqwb362ku3jlm:
-    resolution: {integrity: sha512-jbqgHU3wTzlkuYMzEj4bfwqmKFv5qYuaPtoUCfNBCx/V4WMxwY0SaUoCwTyj8Dx2epMQgG/I6ED1JS2p3Gm/mg==}
+  /@yankeeinlondon/builder-api/1.2.2_jpq67ecuqssjycqwb362ku3jlm:
+    resolution: {integrity: sha512-EDeZbbHdRjm0rqXJhdqeRrSdeo9qza/iPVA31k2jJrRc3sil4gzd1tiMN3qANLetg04x8M+tlfvH0S51a4z5rA==}
     dependencies:
       '@types/markdown-it': 12.2.3
       '@yankeeinlondon/happy-wrapper': 2.10.1_@vitest+ui@0.25.8
       fp-ts: 2.13.1
       inferred-types: 0.37.6_jpq67ecuqssjycqwb362ku3jlm
+      markdown-it: 13.0.1
     transitivePeerDependencies:
       - '@edge-runtime/vm'
       - '@vitest/browser'
@@ -669,8 +670,8 @@ packages:
       - terser
     dev: true
 
-  /@yankeeinlondon/gray-matter/6.1.0_jpq67ecuqssjycqwb362ku3jlm:
-    resolution: {integrity: sha512-rLmadapO8Sjxs6Oe/oHRq99ZTaC6zm/kI4+ny8fq4KeArDzak5Rs0m0sMTvs5XftipZh4cggrPj9YOI+sKXxyg==}
+  /@yankeeinlondon/gray-matter/6.1.1_jpq67ecuqssjycqwb362ku3jlm:
+    resolution: {integrity: sha512-TLtRc/mxI74ahP3s+fJpIi+lBFAhuJuVjiQhmyi/xEwJ2pDepuWMRXT6UfJOA1cGkZ5/XGa9NFw/SQR6M5jfoQ==}
     engines: {node: '>=14.0'}
     dependencies:
       inferred-types: 0.37.6_jpq67ecuqssjycqwb362ku3jlm
@@ -3178,8 +3179,8 @@ packages:
     peerDependencies:
       vite: ^4.0.0
     dependencies:
-      '@yankeeinlondon/builder-api': 1.2.1_jpq67ecuqssjycqwb362ku3jlm
-      '@yankeeinlondon/gray-matter': 6.1.0_jpq67ecuqssjycqwb362ku3jlm
+      '@yankeeinlondon/builder-api': 1.2.2_jpq67ecuqssjycqwb362ku3jlm
+      '@yankeeinlondon/gray-matter': 6.1.1_jpq67ecuqssjycqwb362ku3jlm
       '@yankeeinlondon/happy-wrapper': 2.10.1_@vitest+ui@0.25.8
       markdown-it: 13.0.1
       source-map-js: 1.0.2

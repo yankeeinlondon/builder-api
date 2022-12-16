@@ -51,7 +51,7 @@ export interface BuilderInitializer {
    * If your builder depends on another builder being run prior to it then you can state that
    * here. This will not only ensure that ordering is maintained but also that 
    */
-  usesBuilderApi<O extends BuilderOptions, E extends IPipelineStage>(builder: BuilderApi<O,E>): BuilderInitializer;
+  usesBuilderApi<N extends string, O extends BuilderOptions, E extends IPipelineStage>(builder: BuilderApi<N,O,E>): BuilderInitializer;
   addStyles(...style: any[]): BuilderInitializer;
   /**
    * Provides useful _state_ for a builder author to double-check everything is configured and setup
@@ -105,7 +105,7 @@ export interface BuilderRegistration<
   /**
    * The options _specific_ to the builder
    */
-  options: O;
+  options: Partial<O>;
 
   /**
    * This isn't strictly required, but it is nice to express which rules you have used
@@ -126,16 +126,11 @@ export interface BuilderRegistration<
   initializer?: BuilderHandler<O, PipelineStage.initialize>;
 }
 
-/**
- * a dependency on a stated Builder API by another Builder API
- */
-export type BuilderDependency<T extends Partial<{}> = Partial<{}>> = [builder: BuilderApi<BuilderOptions, IPipelineStage>, options: T];
-
-export type OptionsFor<T extends BuilderApi<BuilderOptions, IPipelineStage>> = T extends BuilderApi<infer O, any>
+export type OptionsFor<T extends BuilderApi<string, BuilderOptions, IPipelineStage>> = T extends BuilderApi<string, infer O, any>
   ? O
   : never;
 
-export type BuilderDependencyApi<B extends BuilderApi<BuilderOptions, IPipelineStage>, E extends string = never> = Omit<{
+export type BuilderDependencyApi<B extends BuilderApi<string, BuilderOptions, IPipelineStage>, E extends string = never> = Omit<{
   /**
    * Allows you to state a preferred option configuration for the Builder
    * you are dependant on. This should be seen as a suggestion more than
@@ -170,66 +165,110 @@ export type BuilderTask<
   S extends IPipelineStage,
 > = () => (payload: Pipeline<S>) => TaskEither<string, Pipeline<S>>;
 
-export interface BuilderApiMeta {
+/**
+ * Properties which can be defined during createBuilder utility
+ */
+export interface BuilderMeta<D extends string = "", R extends RulesUse[] = []> {
+  description?: D;
+  parserRules?: R;
+  initializer?: BuilderHandler<BuilderOptions, "initialize">;
+}
+
+export interface BuilderApiMeta<
+  N extends string, 
+  S extends IPipelineStage,
+  D extends string> {
   /** About the Builder API */
   about: {
-    name: Readonly<string>;
-    description: Readonly<string>;
-    stage: Readonly<string>;
+    name: Readonly<N>;
+    description: Readonly<D>;
+    stage: Readonly<S>;
   };
 }
 
-export type BuilderOptionsFromUser<O extends {}, S extends IPipelineStage> = (options?: Partial<O>) => ConfiguredBuilder<O, S>;
+export type BuilderNeedsUserOptions<O extends {}, S extends IPipelineStage> = (options?: Partial<O>) => BuilderRegistration<O, S>;
 
-/**
- * A builder which has been configured with the user's options
- */
-export type ConfiguredBuilder<O extends {}, S extends IPipelineStage> = () => BuilderRegistration<O,S>;
 
 export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<BuilderOptions, IPipelineStage>[] | []>;
 
+
+
+
 /**
- * Builder's must provide an export which meets this API constraint. Basic
- * structure of this higher order function is:
- *
- * - options( ) -> register( ) -> { handler( payload ) -> payload }
+ * **ConfiguredBuilder**
+ * 
+ * A builder-api which has been configured with the user's options and is now ready
+ * to be used as a handler.
  */
-export type BuilderApi<
-  O extends BuilderOptions,
-  S extends IPipelineStage,
-> = BuilderOptionsFromUser<O, S> & BuilderApiMeta;
+export type ConfiguredBuilder<
+  TName extends string,
+  TOptions extends {}, 
+  TStage extends IPipelineStage,
+  TDescription extends string
+> = (() => BuilderRegistration<TOptions,TStage>) & BuilderApiMeta<TName, TStage, TDescription>;
 
 export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N, lifecycle: L) => (payload: Pipeline<L>) => Pipeline<L>;
 
-export interface BuilderReadyForMeta<O extends BuilderOptions, E extends IPipelineStage> {
+/**
+ * **BuilderApi**
+ * 
+ * The `BuilderApi` is a function which receives a user's options (or none at all) and 
+ * then returns a `ConfiguredBuilder`.
+ * 
+ * ```ts
+ * // as function
+ * const configured = api(options);
+ * // for meta
+ * const stage = api.about.lifecycle;
+ * ```
+ */
+export type BuilderApi<
+  TName extends string,
+  TOptions extends BuilderOptions,
+  TStage extends IPipelineStage,
+  TDescription extends string = "no description"
+> = (
+ (options?: Partial<TOptions>) => ConfiguredBuilder<TName, TOptions, TStage, TDescription>
+) & BuilderApiMeta<TName, TStage, TDescription>;
+
+export interface BuilderReadyForMeta<
+  N extends string, 
+  O extends BuilderOptions, 
+  E extends IPipelineStage
+> {
   /**
    * Step 5:
    * - provide additional details describing this builder
    */
-  meta(m?: Omit<BuilderRegistration<O, E>, "name" | "lifecycle" | "handler" | "options">): BuilderApi<O, E>;
+  meta<D extends string = "no description", R extends RulesUse[] = []>(m?: BuilderMeta<D, R>): BuilderApi<N, O, E, D>;
 }
 
-export interface BuilderReadyForHandler<O extends BuilderOptions, E extends IPipelineStage> {
-  handler(h: BuilderHandler<O, E>): BuilderReadyForMeta<O, E>;
+export interface BuilderReadyForHandler<N extends string, O extends BuilderOptions, E extends IPipelineStage> {
+  handler(h: BuilderHandler<O, E>): BuilderReadyForMeta<N, O, E>;
 }
 
-export interface BuilderReadyForInitializer<O extends BuilderOptions, E extends IPipelineStage> {
+export interface BuilderReadyForInitializer<N extends string, O extends BuilderOptions, E extends IPipelineStage> {
   /**
  * Your builder may optionally provide an _initializer_ function who's utility is
  * establishing context and configuration settings at the top of the build pipeline.
  */
-  initializer(i?: BuilderHandler<O, PipelineStage.initialize>): BuilderReadyForHandler<O, E>;
+  initializer(i?: BuilderHandler<O, PipelineStage.initialize>): BuilderReadyForHandler<N, O, E>;
 }
 
+
+
 /**
- * The **Builder API** now expects to get a _type_ for the options which
- * the API will accept.
+ * **BuilderReadyForOptions**
+ * 
+ * The **Builder API** is now "built" from a library standpoint but need to receive
+ * the user's options.
  */
-export interface BuilderReadyForOptions<E extends IPipelineStage> {
-  options<O extends BuilderOptions = {}>(): BuilderReadyForInitializer<O, E>;
+export interface BuilderReadyForOptions<N extends string, E extends IPipelineStage> {
+  /** add a _type_ for the options your builder will provide */
+  options<O extends BuilderOptions = {}>(): BuilderReadyForInitializer<N, O, E>;
 }
 
 export interface CreateBuilder {
-  <E extends IPipelineStage>(name: string, lifecycle: E): BuilderReadyForOptions<E>;
+  <N extends string, E extends IPipelineStage>(name: N, lifecycle: E): BuilderReadyForOptions<N,E>;
 }
  

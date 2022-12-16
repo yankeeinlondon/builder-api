@@ -1,13 +1,18 @@
 import type {
-  IPipelineStage,
+  IPipelineStage, RulesUse,
 } from "vite-plugin-md";
 import { createFnWithProps } from "inferred-types";
-import type { BuilderApi, BuilderApiMeta, BuilderOptions, BuilderRegistration, ConfiguredBuilder, CreateBuilder } from "./types";
+import type {   BuilderApi, BuilderApiMeta, BuilderMeta, BuilderOptions, CreateBuilder } from "./types";
 
-function createAboutSection<N extends string, S extends IPipelineStage>(name: N, description: string, stage: S): BuilderApiMeta {
+
+function createAboutSection<
+  N extends string, 
+  S extends IPipelineStage,
+  D extends string
+>(name: N, description: D, stage: S): BuilderApiMeta<N,S, D> {
   return {
     about: { name, description, stage },
-  } as BuilderApiMeta;
+  } as BuilderApiMeta<N, S, D>;
 }
 
 /**
@@ -17,13 +22,16 @@ function createAboutSection<N extends string, S extends IPipelineStage>(name: N,
  * - provide the **name** and **lifecycle hook** you'll plug into
  * - provide a generic `<O>` which expresses the options this builder will accept
  */
-export const createBuilder: CreateBuilder = <E extends IPipelineStage>(name: string, lifecycle: E) => {
+export const createBuilder: CreateBuilder = <
+  N extends string, 
+  S extends IPipelineStage
+>(name: N, lifecycle: S) => {
   return {
     /**
      * Step 2:
      * - provide a generic `<O>` which expresses the options this builder will accept
      */
-    options: <O extends BuilderOptions = {}>() => {
+    options: <O extends BuilderOptions>() => {
       return {
         /**
              * Step 3:
@@ -43,23 +51,34 @@ export const createBuilder: CreateBuilder = <E extends IPipelineStage>(name: str
             handler: (handler) => {
               return {
 
-                meta: (meta = {}) => {
+                meta<D extends string, R extends RulesUse[]>(meta: BuilderMeta<D,R> = {} as BuilderMeta<D,R>) {
+                  const apiMeta = createAboutSection(name, meta?.description || "", lifecycle);
                   const registration = {
                     ...meta,
                     name,
                     lifecycle,
+                    description: meta?.description,
+                    parserRules: meta?.parserRules,
                     handler,
                     initializer,
-                  } as unknown as Omit<BuilderRegistration<O, E>, "options">;
+                  };
 
-                  // return a function so that the consumer can add in their options
-                  const fn = (options: Partial<O> = {} as Partial<O>): ConfiguredBuilder<O,E> =>
-                    () => ({ ...registration, options }) as BuilderRegistration<O, E>;
+                  // // return a function so that the consumer can add in their options
+                  // const userOptions = (options: Partial<O> = {} as Partial<O>) => {
+                  //     const reg =  () => { ...registration, options } as BuilderRegistration<O, E>;
+                  //     return createFnWithProps(reg, apiMeta);
+                  //   };
 
-                  const apiMeta = createAboutSection(name, meta.description || "", lifecycle);
-                  const api = createFnWithProps(fn, apiMeta);
+                    
+                  const api  = createFnWithProps(
+                    (options: Partial<O> = {} as Partial<O>) => createFnWithProps(
+                      () => ({...registration, options: options || {} as Partial<O>, ...apiMeta }),
+                      apiMeta
+                    ),
+                    apiMeta
+                  );
 
-                  return api as BuilderApi<O, E>;
+                  return api as unknown as BuilderApi<N, O, S, D>;
                 },
               };
             },

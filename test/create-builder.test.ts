@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { describe, expect, it } from "vitest";
 import type { Equal, Expect, ExpectExtends } from "@type-challenges/utils";
-import type { BuilderApi, BuilderApiMeta, BuilderOptionsFromUser, BuilderReadyForInitializer, BuilderReadyForOptions, ConfiguredBuilder } from "../src";
+import type { BuilderApi, BuilderReadyForHandler, BuilderReadyForInitializer, BuilderReadyForMeta, BuilderReadyForOptions, ConfiguredBuilder } from "../src";
 import { createBuilder } from "../src";
 import { PipelineStage } from "vite-plugin-md";
 
@@ -24,19 +24,19 @@ describe("Builder API registration", () => {
       });
     const complete = d.meta();
 
-    type Expected = BuilderApi<MyBuilderOptions, PipelineStage.parsed>;
-    type ExpectedWithValue = BuilderApi<MyBuilderOptions, "parsed">;
+    type Expected = BuilderApi<"tst", MyBuilderOptions, PipelineStage.parsed>;
+    type ExpectedWithValue = BuilderApi<"tst", MyBuilderOptions, "parsed", "no description">;
     type ExpArg = Parameters<Expected>[0];
 
     type Cases = [
       // Step A
-      Expect<Equal<BuilderReadyForOptions<PipelineStage.parsed>, typeof a>>,
+      Expect<Equal<BuilderReadyForOptions<"tst", PipelineStage.parsed>, typeof a>>,
       // Step B
-      Expect<Equal<BuilderReadyForInitializer<MyBuilderOptions, PipelineStage.parsed>, typeof b>>,
+      Expect<Equal<BuilderReadyForInitializer<"tst", MyBuilderOptions, PipelineStage.parsed>, typeof b>>,
       // Step C
-      // Expect<Equal<BuilderReadyForHandler<MyBuilderOptions, PipelineStage.parsed>, typeof c>>,
+      Expect<Equal<BuilderReadyForHandler<"tst", MyBuilderOptions, PipelineStage.parsed>, typeof c>>,
       // Step D
-      // Expect<Equal<BuilderReadyForMeta<MyBuilderOptions, PipelineStage.parsed>, typeof d>>,
+      Expect<Equal<BuilderReadyForMeta<"tst", MyBuilderOptions, PipelineStage.parsed>, typeof d>>,
 
       // literal type is correct
       Expect<Equal<Expected, typeof complete>>,
@@ -44,7 +44,7 @@ describe("Builder API registration", () => {
       // the function argument is correct
       Expect<Equal<ExpArg, Partial<MyBuilderOptions> | undefined>>,
     ];
-    const cases: Cases = [true, true, true, true, true];
+    const cases: Cases = [true, true, true, true, true, true, true];
     expect(cases).toBe(cases);
   });
 
@@ -56,6 +56,7 @@ describe("Builder API registration", () => {
       .meta({
         description: "this is a test",
       });
+
 
     expect(builder.about).toBeDefined();
     expect(builder.about.description).toBe("this is a test");
@@ -71,17 +72,23 @@ describe("Builder API registration", () => {
     .meta({
       description: "this is a test",
     });
+    expect(builder.about.stage).toBe("parsed");
 
-    type B =typeof builder;
+    const configured = builder({color: "green"});
+    expect(configured.about.stage).toBe("parsed");
+    
+    const ready = configured();
+    expect(ready.description).toBe("this is a test");
+    expect(ready.options.color).toBe("green");
+
+    type B = typeof builder;
     type R = ReturnType<B>;
 
     type cases = [
-      Expect<Equal<B, BuilderOptionsFromUser<{color: string}, "parsed"> & BuilderApiMeta>>,
-      Expect<Equal<R, ConfiguredBuilder<{color: string}, "parsed">>>,
+      Expect<Equal<B, BuilderApi<"foo", {color: string}, "parsed", "this is a test">>>,
+      Expect<Equal<R, ConfiguredBuilder<"foo", {color: string}, "parsed", "this is a test">>>,
     ];
     const cases: cases = [ true, true];
-    
   });
-  
 
 });

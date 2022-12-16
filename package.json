@@ -1,6 +1,6 @@
 {
   "name": "@yankeeinlondon/builder-api",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "type": "module",
   "packageManager": "pnpm@7.18.2",
   "description": "An API used to extend the capabilities of @antfu/vite-plugin-md",

@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import type { Equal, Expect, ExpectExtends } from "@type-challenges/utils";
 import type { BuilderApi, BuilderReadyForHandler, BuilderReadyForInitializer, BuilderReadyForMeta, BuilderReadyForOptions, ConfiguredBuilder } from "../src";
 import { createBuilder } from "../src";
-import { PipelineStage } from "vite-plugin-md";
 
 interface MyBuilderOptions {
   quantity: number;
@@ -12,7 +11,7 @@ interface MyBuilderOptions {
 
 describe("Builder API registration", () => {
   it("using createBuilder provides the correct types at each stage", async () => {
-    const a = createBuilder("tst", PipelineStage.parsed);
+    const a = createBuilder("tst", "parsed");
     const b = a.options<MyBuilderOptions>();
     const c = b.initializer();
     const d = c
@@ -24,19 +23,19 @@ describe("Builder API registration", () => {
       });
     const complete = d.meta();
 
-    type Expected = BuilderApi<"tst", MyBuilderOptions, PipelineStage.parsed>;
+    type Expected = BuilderApi<"tst", MyBuilderOptions, "parsed">;
     type ExpectedWithValue = BuilderApi<"tst", MyBuilderOptions, "parsed", "no description">;
     type ExpArg = Parameters<Expected>[0];
 
     type Cases = [
       // Step A
-      Expect<Equal<BuilderReadyForOptions<"tst", PipelineStage.parsed>, typeof a>>,
+      Expect<Equal<BuilderReadyForOptions<"tst", "parsed">, typeof a>>,
       // Step B
-      Expect<Equal<BuilderReadyForInitializer<"tst", MyBuilderOptions, PipelineStage.parsed>, typeof b>>,
+      Expect<Equal<BuilderReadyForInitializer<"tst", MyBuilderOptions, "parsed">, typeof b>>,
       // Step C
-      Expect<Equal<BuilderReadyForHandler<"tst", MyBuilderOptions, PipelineStage.parsed>, typeof c>>,
+      Expect<Equal<BuilderReadyForHandler<"tst", MyBuilderOptions, "parsed">, typeof c>>,
       // Step D
-      Expect<Equal<BuilderReadyForMeta<"tst", MyBuilderOptions, PipelineStage.parsed>, typeof d>>,
+      Expect<Equal<BuilderReadyForMeta<"tst", MyBuilderOptions, "parsed">, typeof d>>,
 
       // literal type is correct
       Expect<Equal<Expected, typeof complete>>,
@@ -90,5 +89,23 @@ describe("Builder API registration", () => {
     ];
     const cases: cases = [ true, true];
   });
+
+  
+  it("BuilderAPI returns a ConfiguredBuilder", () => {
+    const builder = createBuilder("foo", "parsed")
+    .options<{ color: string }>()
+    .initializer()
+    .handler(p => Promise.resolve(p))
+    .meta({
+      description: "this is a test",
+    });
+    const config = builder({ color: "green" });
+    
+    type cases = [
+      Expect<Equal<typeof config, ConfiguredBuilder<"foo", { color: string }, "parsed", "this is a test">>>
+    ];
+    const cases: cases = [true];
+  });
+  
 
 });

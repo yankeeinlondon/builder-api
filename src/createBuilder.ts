@@ -1,5 +1,5 @@
 import type {
-  IPipelineStage, RulesUse,
+  PipelineStage, RulesUse,
 } from "vite-plugin-md";
 import { createFnWithProps } from "inferred-types";
 import type {   BuilderApi, BuilderApiMeta, BuilderMeta, BuilderOptions, CreateBuilder } from "./types";
@@ -7,7 +7,7 @@ import type {   BuilderApi, BuilderApiMeta, BuilderMeta, BuilderOptions, CreateB
 
 function createAboutSection<
   N extends string, 
-  S extends IPipelineStage,
+  S extends PipelineStage,
   D extends string
 >(name: N, description: D, stage: S): BuilderApiMeta<N,S, D> {
   return {
@@ -24,7 +24,7 @@ function createAboutSection<
  */
 export const createBuilder: CreateBuilder = <
   N extends string, 
-  S extends IPipelineStage
+  S extends PipelineStage
 >(name: N, lifecycle: S) => {
   return {
     /**

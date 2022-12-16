@@ -1,69 +1,6 @@
 /* eslint-disable no-use-before-define */
 import { TaskEither } from "fp-ts/lib/TaskEither";
-import type { IPipelineStage, LinkProperty, Options, Pipeline, PipelineStage, RulesUse, ViteConfig } from "vite-plugin-md";
-import type {PluginSimple, PluginWithOptions} from "markdown-it";
-
-export interface ConfigurationValidation {
-  /**
-   * The overall Vite configuration for the project / app
-   */
-  viteConfig: ViteConfig;
-  /**
-   * Provides a query interface to lookup the configuration of any given builder
-   * that's been added (will return _undefine_ if not found).
-   * 
-   * ```ts
-   * .initializer({
-   *    builderConfig(("code", l) => {
-   *      if(!code) {
-   *        l.warn(
-   *          "this plugin works best when used with 'code' but is not required!"
-   *        );
-   *      }
-   *    })
-   * })
-   * ```
-   * 
-   * Note: _use the provided `logger` to log messages and unless you use `logger.error()`
-   * the execution will proceed._
-   */
-  builderConfig: (cb: (builder: string, logger: any) =>  (Record<string, any> | undefined)) => ConfigurationValidation;
-  /**
-   * Lays out the stages of the pipeline and the order of builder execution
-   * at each stage.
-   */
-  builderPipeline: Record<IPipelineStage, string[]>;
-
-  /**
-   * If you want to add a `<link>` header to the page and know before execution of the handler what
-   * it is, then you can add it here.
-   */
-  addLink: (link: LinkProperty) => ConfigurationValidation;
-}
-
-export interface BuilderInitializer {
-  /**
-   * If your plugin expects one or more markdown-it plugins to run prior to it's handler
-   * than you must state it here.
-   */
-  useMarkdownItPlugins(...plugins: (PluginSimple | PluginWithOptions)[]): BuilderInitializer;
-  /**
-   * If your builder depends on another builder being run prior to it then you can state that
-   * here. This will not only ensure that ordering is maintained but also that 
-   */
-  usesBuilderApi<N extends string, O extends BuilderOptions, E extends IPipelineStage>(builder: BuilderApi<N,O,E>): BuilderInitializer;
-  addStyles(...style: any[]): BuilderInitializer;
-  /**
-   * Provides useful _state_ for a builder author to double-check everything is configured and setup
-   * correctly prior to 
-   * 
-   * @param viteConfig 
-   * @param pluginConfig 
-   * @param pipelineHooks 
-   */
-  validateConfig(viteConfig: ViteConfig, pluginConfig: Options, pipelineHooks: Record<IPipelineStage, string[]>): BuilderInitializer;
-}
-
+import type { Pipeline, PipelineStage, RulesUse } from "vite-plugin-md";
 
 /**
  * Builder options are expected to be a key/value dictionary but must
@@ -76,7 +13,7 @@ export interface BuilderOptions { [key: string]: any }
  */
 export type BuilderHandler<
   O extends BuilderOptions,
-  S extends IPipelineStage,
+  S extends PipelineStage,
 > = (payload: Pipeline<S>, options: O) => Promise<Pipeline<S>>;
 
 /**
@@ -88,7 +25,7 @@ export type BuilderHandler<
  */
 export interface BuilderRegistration<
   O extends BuilderOptions, 
-  S extends IPipelineStage
+  S extends PipelineStage
 > {
   name: Readonly<string>;
   description?: Readonly<string>;
@@ -123,11 +60,11 @@ export interface BuilderRegistration<
    * wait for their event hook to be called (at which point they will get the configuration
    * passed to them).
    */
-  initializer?: BuilderHandler<O, PipelineStage.initialize>;
+  initializer?: BuilderHandler<O, "initialize">;
 }
 
 export type OptionsFor<
-  T extends ConfiguredBuilder<string, {}, IPipelineStage, string>
+  T extends ConfiguredBuilder<string, {}, PipelineStage, string>
 > = T extends BuilderApi<string, infer O, any>
   ? O
   : never;
@@ -139,13 +76,13 @@ export type OptionsFor<
  */
 export type BuilderDependency<
   T extends Partial<{ 
-    builders: readonly ConfiguredBuilder<string, {}, IPipelineStage, string>[];
+    builders: readonly ConfiguredBuilder<string, {}, PipelineStage, string>[];
   }
-> = Partial<{builders: []}>> = [builder: ConfiguredBuilder<string, BuilderOptions, IPipelineStage, string>, options: T];
+> = Partial<{builders: []}>> = [builder: ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>, options: T];
 
 
 export type BuilderDependencyApi<
-    B extends readonly ConfiguredBuilder<string, {}, IPipelineStage, string>[], 
+    B extends readonly ConfiguredBuilder<string, {}, PipelineStage, string>[], 
     E extends string = never
   > = Omit<{
   /**
@@ -157,7 +94,7 @@ export type BuilderDependencyApi<
    * Secondarily, if _other_ Builders depend on the same Builder as you then
    * there will be
    */
-  withConfig: <MB extends ConfiguredBuilder<string, {}, IPipelineStage, string>>(options: MB) => BuilderDependencyApi<[...B, MB], E | "withConfig">;
+  withConfig: <MB extends ConfiguredBuilder<string, {}, PipelineStage, string>>(options: MB) => BuilderDependencyApi<[...B, MB], E | "withConfig">;
   /**
    * Unlike simple configuration options for a builder dependency, those builders which
    * expose their own "hooks/callbacks" should be seen as a _promise_ by the builder that
@@ -179,7 +116,7 @@ export type BuilderDependencyApi<
  * @returns TaskEither<string, Pipeline<S>>
  */
 export type BuilderTask<
-  S extends IPipelineStage,
+  S extends PipelineStage,
 > = () => (payload: Pipeline<S>) => TaskEither<string, Pipeline<S>>;
 
 /**
@@ -193,7 +130,7 @@ export interface BuilderMeta<D extends string = "", R extends RulesUse[] = []> {
 
 export interface BuilderApiMeta<
   N extends string, 
-  S extends IPipelineStage,
+  S extends PipelineStage,
   D extends string> {
   /** About the Builder API */
   about: {
@@ -203,10 +140,10 @@ export interface BuilderApiMeta<
   };
 }
 
-export type BuilderNeedsUserOptions<O extends {}, S extends IPipelineStage> = (options?: Partial<O>) => BuilderRegistration<O, S>;
+export type BuilderNeedsUserOptions<O extends {}, S extends PipelineStage> = (options?: Partial<O>) => BuilderRegistration<O, S>;
 
 
-export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<BuilderOptions, IPipelineStage>[] | []>;
+export type BuilderConfig = Record<PipelineStage, BuilderRegistration<BuilderOptions, PipelineStage>[] | []>;
 
 
 
@@ -220,11 +157,11 @@ export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<BuilderOp
 export type ConfiguredBuilder<
   TName extends string,
   TOptions extends {}, 
-  TStage extends IPipelineStage,
+  TStage extends PipelineStage,
   TDescription extends string
 > = (() => BuilderRegistration<TOptions,TStage>) & BuilderApiMeta<TName, TStage, TDescription>;
 
-export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N, lifecycle: L) => (payload: Pipeline<L>) => Pipeline<L>;
+export type InlineBuilder = <N extends string, L extends PipelineStage>(name: N, lifecycle: L) => (payload: Pipeline<L>) => Pipeline<L>;
 
 /**
  * **BuilderApi**
@@ -242,7 +179,7 @@ export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N
 export type BuilderApi<
   TName extends string,
   TOptions extends BuilderOptions,
-  TStage extends IPipelineStage,
+  TStage extends PipelineStage,
   TDescription extends string = "no description"
 > = (
  (options?: Partial<TOptions>) => ConfiguredBuilder<TName, TOptions, TStage, TDescription>
@@ -251,7 +188,7 @@ export type BuilderApi<
 export interface BuilderReadyForMeta<
   N extends string, 
   O extends BuilderOptions, 
-  E extends IPipelineStage
+  E extends PipelineStage
 > {
   /**
    * Step 5:
@@ -260,16 +197,16 @@ export interface BuilderReadyForMeta<
   meta<D extends string = "no description", R extends RulesUse[] = []>(m?: BuilderMeta<D, R>): BuilderApi<N, O, E, D>;
 }
 
-export interface BuilderReadyForHandler<N extends string, O extends BuilderOptions, E extends IPipelineStage> {
+export interface BuilderReadyForHandler<N extends string, O extends BuilderOptions, E extends PipelineStage> {
   handler(h: BuilderHandler<O, E>): BuilderReadyForMeta<N, O, E>;
 }
 
-export interface BuilderReadyForInitializer<N extends string, O extends BuilderOptions, E extends IPipelineStage> {
+export interface BuilderReadyForInitializer<N extends string, O extends BuilderOptions, E extends PipelineStage> {
   /**
  * Your builder may optionally provide an _initializer_ function who's utility is
  * establishing context and configuration settings at the top of the build pipeline.
  */
-  initializer(i?: BuilderHandler<O, PipelineStage.initialize>): BuilderReadyForHandler<N, O, E>;
+  initializer(i?: BuilderHandler<O, "initialize">): BuilderReadyForHandler<N, O, E>;
 }
 
 
@@ -280,12 +217,12 @@ export interface BuilderReadyForInitializer<N extends string, O extends BuilderO
  * The **Builder API** is now "built" from a library standpoint but need to receive
  * the user's options.
  */
-export interface BuilderReadyForOptions<N extends string, E extends IPipelineStage> {
+export interface BuilderReadyForOptions<N extends string, E extends PipelineStage> {
   /** add a _type_ for the options your builder will provide */
   options<O extends BuilderOptions = {}>(): BuilderReadyForInitializer<N, O, E>;
 }
 
 export interface CreateBuilder {
-  <N extends string, E extends IPipelineStage>(name: N, lifecycle: E): BuilderReadyForOptions<N,E>;
+  <N extends string, E extends PipelineStage>(name: N, lifecycle: E): BuilderReadyForOptions<N,E>;
 }
  

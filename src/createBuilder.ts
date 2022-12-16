@@ -11,6 +11,7 @@ function createAboutSection<
   D extends string
 >(name: N, description: D, stage: S): BuilderApiMeta<N,S, D> {
   return {
+    kind: "builder",
     about: { name, description, stage },
   } as BuilderApiMeta<N, S, D>;
 }
@@ -33,21 +34,10 @@ export const createBuilder: CreateBuilder = <
      */
     options: <O extends BuilderOptions>() => {
       return {
-        /**
-             * Step 3:
-             * - _if_ your builder needs to initialize state in some way prior
-             * to be calling by the event hook, then you should add it here
-             * - this is purely optional
-             */
+        // initializer
         initializer: (initializer) => {
           return {
-            /**
-             * Step 4:
-             * - provide the **handler function** which is called upon reaching the
-             * lifecycle event you've subscribed to
-             * - your handler should be an async function which will receive the payload
-             * along with any options that your builder has configured
-             */
+            // Handler
             handler: (handler) => {
               return {
 
@@ -63,13 +53,6 @@ export const createBuilder: CreateBuilder = <
                     initializer,
                   };
 
-                  // // return a function so that the consumer can add in their options
-                  // const userOptions = (options: Partial<O> = {} as Partial<O>) => {
-                  //     const reg =  () => { ...registration, options } as BuilderRegistration<O, E>;
-                  //     return createFnWithProps(reg, apiMeta);
-                  //   };
-
-                    
                   const api  = createFnWithProps(
                     (options: Partial<O> = {} as Partial<O>) => createFnWithProps(
                       () => ({...registration, options: options || {} as Partial<O>, ...apiMeta }),

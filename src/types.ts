@@ -10,6 +10,8 @@ export interface BuilderOptions { [key: string]: any }
 
 /**
  * The Builder's event listener/handler
+ * 
+ * **Note:** remember that handlers are meant to be async
  */
 export type BuilderHandler<
   O extends BuilderOptions,
@@ -132,6 +134,7 @@ export interface BuilderApiMeta<
   N extends string, 
   S extends PipelineStage,
   D extends string> {
+  kind: "builder";
   /** About the Builder API */
   about: {
     name: Readonly<N>;
@@ -144,9 +147,6 @@ export type BuilderNeedsUserOptions<O extends {}, S extends PipelineStage> = (op
 
 
 export type BuilderConfig = Record<PipelineStage, BuilderRegistration<BuilderOptions, PipelineStage>[] | []>;
-
-
-
 
 /**
  * **ConfiguredBuilder**

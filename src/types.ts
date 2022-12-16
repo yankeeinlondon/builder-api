@@ -130,8 +130,19 @@ export type OptionsFor<T extends BuilderApi<string, BuilderOptions, IPipelineSta
   ? O
   : never;
 
-export type BuilderDependency<T extends Partial<{}> = Partial<{}>> = [builder: BuilderApi<string, BuilderOptions, IPipelineStage>, options: T];
-export type BuilderDependencyApi<B extends BuilderApi<string, BuilderOptions, IPipelineStage>, E extends string = never> = Omit<{
+
+/**
+ * **BuilderDependency**
+ * 
+ */
+export type BuilderDependency<
+  T extends Partial<{ 
+    builders: readonly ConfiguredBuilder<string, {}, IPipelineStage, string>[];
+  }
+> = Partial<{builders: []}>> = [builder: ConfiguredBuilder<string, BuilderOptions, IPipelineStage, string>, options: T];
+
+
+  export type BuilderDependencyApi<B extends BuilderApi<string, BuilderOptions, IPipelineStage>, E extends string = never> = Omit<{
   /**
    * Allows you to state a preferred option configuration for the Builder
    * you are dependant on. This should be seen as a suggestion more than

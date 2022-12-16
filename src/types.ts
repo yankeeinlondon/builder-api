@@ -126,7 +126,9 @@ export interface BuilderRegistration<
   initializer?: BuilderHandler<O, PipelineStage.initialize>;
 }
 
-export type OptionsFor<T extends BuilderApi<string, BuilderOptions, IPipelineStage>> = T extends BuilderApi<string, infer O, any>
+export type OptionsFor<
+  T extends ConfiguredBuilder<string, {}, IPipelineStage, string>
+> = T extends BuilderApi<string, infer O, any>
   ? O
   : never;
 
@@ -142,7 +144,10 @@ export type BuilderDependency<
 > = Partial<{builders: []}>> = [builder: ConfiguredBuilder<string, BuilderOptions, IPipelineStage, string>, options: T];
 
 
-  export type BuilderDependencyApi<B extends BuilderApi<string, BuilderOptions, IPipelineStage>, E extends string = never> = Omit<{
+export type BuilderDependencyApi<
+    B extends readonly ConfiguredBuilder<string, {}, IPipelineStage, string>[], 
+    E extends string = never
+  > = Omit<{
   /**
    * Allows you to state a preferred option configuration for the Builder
    * you are dependant on. This should be seen as a suggestion more than
@@ -152,7 +157,7 @@ export type BuilderDependency<
    * Secondarily, if _other_ Builders depend on the same Builder as you then
    * there will be
    */
-  withConfig: (options: OptionsFor<B>) => BuilderDependencyApi<B, E | "withConfig">;
+  withConfig: <MB extends ConfiguredBuilder<string, {}, IPipelineStage, string>>(options: MB) => BuilderDependencyApi<[...B, MB], E | "withConfig">;
   /**
    * Unlike simple configuration options for a builder dependency, those builders which
    * expose their own "hooks/callbacks" should be seen as a _promise_ by the builder that
